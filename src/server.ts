@@ -11,6 +11,7 @@ import { ClassContainer } from './class-container';
 import { PluginLoader } from './plugins';
 import { Fastify } from './servers/fastify/fastify';
 import * as figlet from 'figlet';
+import { ServerContainer } from './server-container';
 export interface IApp {
     set(key, value);
 }
@@ -107,7 +108,6 @@ export class Server {
 
         const loadOrder = [
             ServerType.HTTP2,
-            ServerType.ExpressPartial,
             ServerType.Express,
             ServerType.Socket,
             ServerType.RabbitMQ,
@@ -123,108 +123,107 @@ export class Server {
                     }
 
                     const aServerInstance = Servers.get(this.instanceId, serverType);
+                    if (!aServerInstance) {
+                        server.instanceId = this.instanceId;
+                        const serverContainer = new ServerContainer(server, this);
+                    }
+                    return;
                     switch (serverType) {
-                        case ServerType.HTTP2:
-                            {
-                                if (!aServerInstance) {
-                                    logger.info(this, colors.red(`> Starting HTTP2 server on port ${port}`));
-                                    console.log(colors.red(`> Starting HTTP2 server on port ${port}`));
-                                    this._app[serverType] = new Fastify(port, onStart);
-                                    const app = Servers.set(this.instanceId, server.type, this._app[serverType]);
-                                    this.app = app._app;
+                        case ServerType.HTTP2: {
+                            if (!aServerInstance) {
+                                logger.info(this, colors.red(`> Starting HTTP2 server on port ${port}`));
+                                console.log(colors.red(`> Starting HTTP2 server on port ${port}`));
+                                this._app[serverType] = new Fastify(port, onStart);
+                                const app = Servers.set(this.instanceId, server.type, this._app[serverType]);
+                                this.app = app._app;
 
-                                    const httpServer = Servers.get(this.instanceId, 'http')
-                                        || http.createServer(app._app);
-                                    this._app.http = httpServer;
-                                    Servers.set(this.instanceId, 'http', httpServer);
-                                }
-
-                                this.config.servers.forEach((serverConfiguration) => {
-                                    if (serverConfiguration.type === serverType && serverConfiguration.onStart) {
-                                        onStart.push(serverConfiguration.onStart);
-                                    }
-                                });
-                                break;
-
+                                const httpServer = Servers.get(this.instanceId, 'http')
+                                    || http.createServer(app._app);
+                                this._app.http = httpServer;
+                                Servers.set(this.instanceId, 'http', httpServer);
                             }
-                        case ServerType.Express:
-                            {
-                                if (!aServerInstance) {// !this.app && !this._app[serverType]) {
-                                    logger.info(this, colors.green(`> Starting REST server on port ${port}`));
-                                    console.log(colors.green(`> Starting REST server on port ${port}`));
-                                    this._app[serverType] = new Express(port, onStart);
-                                    const app = Servers.set(this.instanceId, server.type, this._app[serverType]);
-                                    this.app = app._app;
-                                    const httpServer = Servers.get(this.instanceId, 'http')
-                                        || http.createServer(app._app);
-                                    this._app.http = httpServer;
-                                    Servers.set(this.instanceId, 'http', httpServer);
-                                } else {
-                                    // express was allready initiated //this._app[serverType] =
-                                    const partialExpress = new ExpressPartial(this.app);
-                                    Servers.set(this.instanceId, server.type, partialExpress);
+
+                            this.config.servers.forEach((serverConfiguration) => {
+                                if (serverConfiguration.type === serverType && serverConfiguration.onStart) {
+                                    onStart.push(serverConfiguration.onStart);
                                 }
+                            });
+                            break;
 
-                                this.config.servers.forEach((serverConfiguration) => {
-                                    if (serverConfiguration.type === serverType && serverConfiguration.onStart) {
-                                        onStart.push(serverConfiguration.onStart);
-                                    }
-                                });
-                                break;
-
+                        }
+                        case ServerType.Express: {
+                            if (!aServerInstance) {// !this.app && !this._app[serverType]) {
+                                logger.info(this, colors.green(`> Starting REST server on port ${port}`));
+                                console.log(colors.green(`> Starting REST server on port ${port}`));
+                                this._app[serverType] = new Express(port, onStart);
+                                const app = Servers.set(this.instanceId, server.type, this._app[serverType]);
+                                this.app = app._app;
+                                const httpServer = Servers.get(this.instanceId, 'http')
+                                    || http.createServer(app._app);
+                                this._app.http = httpServer;
+                                Servers.set(this.instanceId, 'http', httpServer);
+                            } else {
+                                // express was allready initiated //this._app[serverType] =
+                                const partialExpress = new ExpressPartial(this.app);
+                                Servers.set(this.instanceId, server.type, partialExpress);
                             }
-                        case ServerType.Socket:
-                            {
-                                logger.info(this, colors.green(`> Starting SOCKETIO server on port ${port}`));
-                                console.log(colors.green(`> Starting SOCKETIO server on port ${port}`));
 
-                                const httpServer = Servers.get(this.instanceId, 'http');
+                            this.config.servers.forEach((serverConfiguration) => {
+                                if (serverConfiguration.type === serverType && serverConfiguration.onStart) {
+                                    onStart.push(serverConfiguration.onStart);
+                                }
+                            });
+                            break;
 
-                                // if (!httpServer) {
-                                //     httpServer = this.httpServer;
-                                // }
+                        }
+                        case ServerType.Socket: {
+                            logger.info(this, colors.green(`> Starting SOCKETIO server on port ${port}`));
+                            console.log(colors.green(`> Starting SOCKETIO server on port ${port}`));
 
-                                const app = new SocketIO(server.options, httpServer);
+                            const httpServer = Servers.get(this.instanceId, 'http');
+
+                            // if (!httpServer) {
+                            //     httpServer = this.httpServer;
+                            // }
+
+                            const app = new SocketIO(server.options, httpServer);
+                            Servers.set(this.instanceId, server.type, app);
+                            // if (server.onStart)
+                            //     server.onStart(app);
+                            break;
+                        }
+                        case ServerType.RabbitMQ: {
+                            console.log(colors.green(`> Starting MQ server`));
+                            logger.info(this, colors.green(`> Starting MQ server`));
+                            try {
+                                const app = new MQ(server.options);
                                 Servers.set(this.instanceId, server.type, app);
-                                // if (server.onStart)
-                                //     server.onStart(app);
-                                break;
+                            } catch (error) {
+                                logger.error(error);
                             }
-                        case ServerType.RabbitMQ:
-                            {
-                                console.log(colors.green(`> Starting MQ server`));
-                                logger.info(this, colors.green(`> Starting MQ server`));
-                                try {
-                                    const app = new MQ(server.options);
-                                    Servers.set(this.instanceId, server.type, app);
-                                } catch (error) {
-                                    logger.error(error);
-                                }
-                                break;
+                            break;
+                        }
+                        case ServerType.Kafka: {
+                            logger.info(this, colors.green(`> Starting Kafka server`));
+                            try {
+                                const app = new Kafka(server.options);
+                                Servers.set(this.instanceId, server.type, app);
+                            } catch (error) {
+                                logger.error(error);
                             }
-                        case ServerType.Kafka:
-                            {
-                                logger.info(this, colors.green(`> Starting Kafka server`));
-                                try {
-                                    const app = new Kafka(server.options);
-                                    Servers.set(this.instanceId, server.type, app);
-                                } catch (error) {
-                                    logger.error(error);
-                                }
-                                break;
+                            break;
+                        }
+                        case ServerType.Redis: {
+                            logger.info(this, colors.green(`> Starting REDIS server`));
+                            try {
+                                const app: any = new Redis(server.options);
+                                app.connection = new RedisServer();
+                                Servers.set(this.instanceId, server.type, app);
+                            } catch (error) {
+                                logger.error(error);
                             }
-                        case ServerType.Redis:
-                            {
-                                logger.info(this, colors.green(`> Starting REDIS server`));
-                                try {
-                                    const app: any = new Redis(server.options);
-                                    app.connection = new RedisServer();
-                                    Servers.set(this.instanceId, server.type, app);
-                                } catch (error) {
-                                    logger.error(error);
-                                }
-                                break;
-                            }
+                            break;
+                        }
                     }
                 }
             }

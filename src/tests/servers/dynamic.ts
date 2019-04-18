@@ -2,12 +2,14 @@ import { TestClass } from '../classes/TestClass';
 import { FirstClass } from '../classes/FirstClass';
 import { Server, MethodType, MethodusConfig } from '../../index';
 import { ServerType } from '../../interfaces';
+import * as path from 'path';
 
 const redis_addr = '//localhost:5672';
 const config = new MethodusConfig();
 if (process.env.servers) {
     process.env.servers.split(',').forEach((server: ServerType) => {
         config.run(server, {
+            path: path.join(process.cwd() , '/src/servers/express'),
             nsp: '/',
             port: process.env.PORT,
             userName: 'guest',

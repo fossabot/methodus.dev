@@ -9,6 +9,7 @@ async function init() {
     if (process.env.servers) {
         process.env.servers.split(',').forEach((server: ServerType) => {
             config.run(server, {
+                path: '/src/servers/express',
                 nsp: '/', port: process.env.PORT, client: redis_addr,
                 server: redis_addr, userName: 'guest',
                 password: '12' + '34', amqp,

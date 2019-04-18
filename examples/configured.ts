@@ -1,4 +1,5 @@
 process.env.test = 'true';
+import * as path from 'path';
 
 import {
     ServerConfiguration,
@@ -6,7 +7,9 @@ import {
 } from '../';
 import { ScreensDataController } from './controllers/screen.data.controller';
 
-@ServerConfiguration(ServerType.Express, { port: process.env.PORT || 6695 })
+const expressModule = path.join(process.cwd(), '/src/servers/express');
+
+@ServerConfiguration(ServerType.Express, { path: expressModule, port: process.env.PORT || 6695 })
 @PluginConfiguration('@methodus/describe')
 @ClientConfiguration(ScreensDataController, MethodType.Local, ServerType.Express)
 export class Xserver extends ConfiguredServer {
