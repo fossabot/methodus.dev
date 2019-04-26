@@ -221,7 +221,7 @@ export function Method(verb: Verbs, route: string, middlewares?: any[]) {
         delete descriptor.value;
         delete descriptor.writable;
 
-        descriptor.get = function(...args) {
+        descriptor.get = function() {
             // Create an instance of the bound function for the instance.
             // And set an instance property to override the property
             // from the object prototype.
@@ -229,7 +229,7 @@ export function Method(verb: Verbs, route: string, middlewares?: any[]) {
                 enumerable: descriptor.enumerable,
                 configurable: descriptor.configurable,
                 value() {
-                    return value.apply(this, ...args);
+                    return value.apply(this, arguments);
                 },
             });
         };
