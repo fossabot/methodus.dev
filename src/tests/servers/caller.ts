@@ -6,17 +6,7 @@ const amqp = 'localhost:5672';
 
 async function init() {
     const config = new MethodusConfig();
-    if (process.env.servers) {
-        process.env.servers.split(',').forEach((server: ServerType) => {
-            config.run(server, {
-                path: '/src/servers/express',
-                nsp: '/', port: process.env.PORT, client: redis_addr,
-                server: redis_addr, userName: 'guest',
-                password: '12' + '34', amqp,
-            });
-            config.use(TestClass, process.env.METHODTYPE as MethodType, server, 'http://127.0.0.1:8090');
-        });
-    }
+    config.use(TestClass, process.env.METHODTYPE as MethodType, null, 'http://127.0.0.1:8090');
 
     await new Server(process.env.PORT).configure(config)
         // .plugins([{ name: '@methodus/describe', options: {} }])

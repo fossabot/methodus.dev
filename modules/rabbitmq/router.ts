@@ -1,8 +1,8 @@
 import 'reflect-metadata';
-import { fp } from '../../fp';
+import { fp } from '../../src/fp';
 import { AMQP, registerHandlers, registerWorkers } from './';
-import { logger, LogClass } from '../../log';
-import { MethodMessage } from '../../response';
+import { logger, LogClass } from '../../src/log';
+import { MethodMessage } from '../../src/response';
 import * as domain from 'domain';
 import { ConnectionOptions } from './connection-options';
 const metadataKey = 'methodus';

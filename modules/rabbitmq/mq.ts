@@ -1,11 +1,11 @@
 
 import 'reflect-metadata';
-import { fp } from '../../fp';
+import { fp } from '../../src/fp';
 import { MQRouter } from './router';
-import { BaseServer } from '../base';
-import { logger, LogClass } from '../../log';
-import { MethodType } from '../../interfaces';
-import { MethodEvent, MethodMessage, generateUuid } from '../../response';
+import { BaseServer } from '../../src/servers/base';
+import { logger, LogClass } from '../../src/log';
+import { MethodType } from '../../src/interfaces';
+import { MethodEvent, MethodMessage, generateUuid } from '../../src/response';
 import { AMQP } from './amqp';
 
 @LogClass(logger)

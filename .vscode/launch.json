@@ -11,7 +11,7 @@
             "name": "> HTTP2 server",
             "program": "${workspaceRoot}/src/tests/servers/dynamic.js",
             "cwd": "${workspaceRoot}/",
-            "console": "integratedTerminal",
+            "console": "internalConsole",
             "outFiles": [],
             "sourceMaps": true,
             "env": {
@@ -19,7 +19,7 @@
                 "DEBUG": "none",
                 "NODE_ENV": "debug",
                 "NODE_LOG_LEVEL": "trace",
-                "servers": "http2",
+                "servers": "HTTP2",
                 "MethodType": "Local"
             }
         },
@@ -55,9 +55,8 @@
                 "PORT": "8080",
                 "DEBUG": "none",
                 "NODE_LOG_LEVEL": "debug",
-                "NODE_ENV": "debug",
-                "servers": "express",
-                "MethodType": "Http"
+                "NODE_ENV": "debug",               
+                "TransportType": "Http"
             }
         },
         {
@@ -74,7 +73,7 @@
                 "DEBUG": "none",
                 "NODE_ENV": "debug",
                 "NODE_LOG_LEVEL": "trace",
-                "servers": "express",
+                "servers": "Express",
                 "MethodType": "Local"
             }
         },
@@ -289,7 +288,7 @@
                 "PORT": "8080",
                 "DEBUG": "socket.io-client:manager",
                 "NODE_ENV": "debug",
-                "servers": "socketio",
+                "servers": "asdasdasd",
                 "MethodType": "Socket"
             }
         },
@@ -306,7 +305,7 @@
                 "PORT": "8090",
                 "DEBUG": "none",
                 "NODE_ENV": "debug",
-                "servers": "socketio",
+                "servers": "Socket",
                 "MethodType": "Local"
             }
         },
@@ -425,7 +424,7 @@
             "stopOnEntry": false,
             // Command line arguments passed to the program.
             "args": [
-                "src/tests/servers.spec.js"
+                "tests/servers.spec.js"
             ],
             "sourceMaps": true,
             // Workspace relative or absolute path to the working directory of the program being debugged. Default is the current workspace.

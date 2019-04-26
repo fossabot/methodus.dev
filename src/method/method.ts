@@ -37,7 +37,8 @@ export function Method(verb: Verbs, route: string, middlewares?: any[]) {
         });
         // save a reference to the original method
         const originalMethod = descriptor.value;
-        descriptor.value = async (...args: any[]) => {
+        // const {value} = descriptor;
+        const value = async function(...args: any[]) {
 
             if (args && args[args.length - 1] && args[args.length - 1].instruct) {
                 mTarget = args[args.length - 1].target;
@@ -121,7 +122,7 @@ export function Method(verb: Verbs, route: string, middlewares?: any[]) {
                         }
                         break;
                     case MethodType.Local:
-                        methodResult = await originalMethod.apply(target, ParserResponse.args);
+                        methodResult = await originalMethod.apply(this, ParserResponse.args);
                         break;
                     case MethodType.Http2:
                         server = ServerType.HTTP2;
@@ -215,6 +216,22 @@ export function Method(verb: Verbs, route: string, middlewares?: any[]) {
 
                 return methodResult;
             }
+        };
+
+        delete descriptor.value;
+        delete descriptor.writable;
+
+        descriptor.get = function(...args) {
+            // Create an instance of the bound function for the instance.
+            // And set an instance property to override the property
+            // from the object prototype.
+            Object.defineProperty(this, propertyKey, {
+                enumerable: descriptor.enumerable,
+                configurable: descriptor.configurable,
+                value() {
+                    return value.apply(this, ...args);
+                },
+            });
         };
         return descriptor;
     };

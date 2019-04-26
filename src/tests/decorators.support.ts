@@ -11,11 +11,12 @@ import {
 } from '../';
 import { FirstClass } from './classes/FirstClass';
 import { SecondClass } from './classes/SecondClass';
+import { RouterConfiguration } from '../decorators';
 
 @ServerConfiguration(ServerType.Express, { port: process.env.PORT || 6695 })
 @PluginConfiguration(path.join(__dirname, 'static'), { path: '/client' })
-@ClientConfiguration(FirstClass, MethodType.Local, ServerType.Express)
-@ClientConfiguration(SecondClass, MethodType.Local, ServerType.Express)
+@RouterConfiguration(FirstClass, ServerType.Express)
+@RouterConfiguration(SecondClass, ServerType.Express)
 export class Xserver extends ConfiguredServer {
     constructor() {
         super(Xserver);

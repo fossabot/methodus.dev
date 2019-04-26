@@ -1,10 +1,10 @@
 
 import 'reflect-metadata';
-import { fp } from '../fp';
-import { AMQP } from './rabbitmq';
-import { BaseServer } from './base';
-import { logger, LogClass } from '../log';
-import { MethodEvent, MethodMessage } from '../response';
+import { fp } from '../../src/fp';
+// import { AMQP } from './rabbitmq';
+import { BaseServer } from '../../src/servers/base';
+import { logger, LogClass } from '../../src/log';
+import { MethodEvent, MethodMessage } from '../../src/response';
 const metadataKey = 'methodus';
 const kafka = require('kafka-node'),
     Producer = kafka.Producer;
@@ -19,14 +19,7 @@ export class Kafka extends BaseServer {
     }
 
     async _sendEvent(methodEvent: MethodEvent) {
-        return new Promise((resolve, reject) => {
-            AMQP.connect(this.options).then((conn) => {
-                conn.createChannel().then((ch) => {
-                    ch.assertExchange('event-bus', 'fanout', { durable: true });
-                    ch.publish('event-bus', '', Buffer.from(JSON.stringify(methodEvent)));
-                });
-            });
-        });
+
     }
 
     useClass(classType) {

@@ -1,13 +1,16 @@
 import 'reflect-metadata';
 // <references path='../interfaces/methodus.ts' />
 const debug = require('debug')('methodus');
-import * as Methodus from '../interfaces/';
-import { MethodEvent } from '../response';
-import { fp } from '../fp';
-import { BaseServer } from './base';
+import * as Methodus from '../../interfaces/';
+import { MethodEvent } from '../../response';
+import { fp } from '../../fp';
+import { BaseServer } from '../base';
 const metadataKey = 'methodus';
-import { logger, LogClass } from '../log';
+import { logger, LogClass } from '../../log';
 import * as socketIO from 'socket.io';
+import * as http from 'http';
+import * as colors from 'colors';
+import { Servers } from '../';
 
 @LogClass(logger)
 export class SocketIO extends BaseServer {
@@ -128,4 +131,22 @@ export class SocketIORouter implements Methodus.Router {
             });
         });
     }
+}
+
+export function register(server, parentServer) {
+    const serverType = server.type.name;
+
+    logger.info(this, colors.green(`> Starting SOCKETIO server on port ${server.options.port}`));
+    console.log(colors.green(`> Starting SOCKETIO server on port ${server.options.port}`));
+
+    const httpServer = Servers.get(server.instanceId, 'http');
+
+    // if (!httpServer) {
+    //     httpServer = this.httpServer;
+    // }
+
+    const app = new SocketIO(server.options, httpServer);
+    Servers.set(server.instanceId, serverType, app);
+    // if (server.onStart)
+    //     server.onStart(app);
 }

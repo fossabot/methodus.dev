@@ -1,6 +1,6 @@
 import * as uuidv1 from 'uuid/v1';
 import { MethodEvent, MethodError } from '../response/';
-import { Request } from '../servers/express/Request';
+
 import { ServerType } from '../interfaces';
 
 export class ServersList {
@@ -36,27 +36,27 @@ export class ServersList {
         }
     }
 
-    public send(server, functionArgs, methodus, paramsMap, securityContext?) {
-        if (this.instances && Object.keys(this.instances).length) {
-            for (const instanceKey in this.instances) {
-                if (this.instances[instanceKey][server]) {
-                    const result = this.instances[instanceKey][server]._send(functionArgs,
-                        methodus, paramsMap, securityContext);
-                    return result;
-                }
-            }
-        } else {
-            if (server === ServerType.Express || server === ServerType.ExpressPartial) {
-                const request = new Request();
-                const baseUrl = methodus.resolver();
-                if (baseUrl) {
-                    return request.sendRequest(methodus.verb, baseUrl + methodus.route, functionArgs,
-                        paramsMap, securityContext);
-                } else {
-                    return new MethodError('no server found for this method' + methodus.route, 302);
-                }
-            }
-        }
+    public send(server: any, functionArgs: any, methodus: any, paramsMap: any, securityContext: any) {
+        // if (this.instances && Object.keys(this.instances).length) {
+        //     for (const instanceKey in this.instances) {
+        //         if (this.instances[instanceKey][server]) {
+        //             const result = this.instances[instanceKey][server]._send(functionArgs,
+        //                 methodus, paramsMap, securityContext);
+        //             return result;
+        //         }
+        //     }
+        // } else {
+        //     if (server === ServerType.Express ) {
+        //         const request = new Request();
+        //         const baseUrl = methodus.resolver();
+        //         if (baseUrl) {
+        //             return request.sendRequest(methodus.verb, baseUrl + methodus.route, functionArgs,
+        //                 paramsMap, securityContext);
+        //         } else {
+        //             return new MethodError('no server found for this method' + methodus.route, 302);
+        //         }
+        //     }
+        // }
 
     }
 }

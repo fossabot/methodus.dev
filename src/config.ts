@@ -1,7 +1,7 @@
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
 import { logger, LogClass } from './log';
-import { MethodType, ServerType } from './interfaces';
+import { MethodType, ServerType, TransportType } from './interfaces';
 import { Verbs } from './verbs';
 
 export interface MethodDescriptor {
@@ -34,6 +34,24 @@ export class MethodusClassConfig {
         };
     }
 }
+
+@LogClass(logger)
+export class MethodusClientConfig {
+    public transportType: any;
+    public classType: any;
+    public serviceName: string;
+    public resolver: Promise<string> | string | any;
+    constructor(classType: any, transportType: TransportType,
+        resolver?: Promise<any> | any) {
+        this.classType = classType;
+        this.transportType = transportType;
+
+        this.resolver = () => {
+            return resolver;
+        };
+    }
+}
+
 export interface PluginEntry {
     name: string;
     options: any;
@@ -44,6 +62,7 @@ export class MethodusConfig {
 
     public classes: Map<string, MethodusClassConfig> = new Map<string, MethodusClassConfig>();
     public servers: ServerConfig[];
+    public clients: Map<string, MethodusClientConfig> = new Map<string, MethodusClientConfig>();
     public plugins: PluginEntry[];
     public port: number;
 
@@ -57,6 +76,17 @@ export class MethodusConfig {
         }
     }
 
+    public useClient(classType: any, transportType: TransportType,
+        resolver?: Promise<any> | string | any) {
+        if (transportType === TransportType.Http && !resolver) {
+            throw (new Error('Http transport requires a resolver, pass in a string or a promise'));
+        }
+
+        const configEntry = new MethodusClientConfig(classType, transportType, resolver);
+        this.clients.set(classType.name, configEntry);
+
+    }
+
     public use(classType: any, methodType: MethodType,
         serverType: ServerType, resolver?: Promise<any> | string | any) {
         if (methodType === MethodType.Http && !resolver) {
@@ -64,13 +94,9 @@ export class MethodusConfig {
         }
 
         const configEntry = new MethodusClassConfig(classType, methodType, serverType, resolver);
-        
         this.classes.set(classType.name, configEntry);
-
-        // if (classType.methodus) {
-        //     this.classes.set(classType.methodus[classType.name], configEntry);
-        // }
     }
+
     public run(serverType: ServerType, configuration: any) {
         this.servers = this.servers || [];
         this.servers.push(new ServerConfig(serverType, configuration));
@@ -79,6 +105,7 @@ export class MethodusConfig {
 
 @LogClass(logger)
 export class ServerConfig {
+    instanceId: string;
     type: ServerType | any;
     options: any;
     onStart?: () => {};

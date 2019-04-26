@@ -1,6 +1,6 @@
 
-import { Container } from '../../container';
-import { MethodError } from '../../response/';
+import { Container } from '../../src/container';
+import { MethodError } from '../../src/response/';
 import { ConnectionOptions } from './connection-options';
 const amqp = Container.get('amqplib');
 export class AMQP {

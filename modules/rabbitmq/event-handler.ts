@@ -1,8 +1,8 @@
 import 'reflect-metadata';
-import { fp } from '../../fp';
+import { fp } from '../../src/fp';
 import { AMQP } from './amqp';
-import { logger } from '../../log';
-import { MethodEvent } from '../../response';
+import { logger } from '../../src/log';
+import { MethodEvent } from '../../src/response';
 import * as domain from 'domain';
 
 export async function registerHandlers(proto, options) {

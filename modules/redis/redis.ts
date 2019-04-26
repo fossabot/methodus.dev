@@ -1,12 +1,12 @@
 // <references path='../interfaces/methodus.ts' />
 import 'reflect-metadata';
-import { MethodResult, MethodError, MethodEvent, MethodMessage } from '../response';
-import * as Methodus from '../interfaces/';
-import { BaseServer } from './base';
-import { logger, LogClass } from '../log';
-import { Container } from '../container';
+import { MethodResult, MethodError, MethodEvent, MethodMessage } from '../../src/response';
+import * as Methodus from '../../src/interfaces/';
+import { BaseServer } from '../../src/servers/base';
+import { logger, LogClass } from '../../src/log';
+import { Container } from '../../src/container';
 const redis = Container.get('redis');
-import { fp } from '../fp';
+import { fp } from '../../src/fp';
 const redis_addr = '//192.168.99.100:32768';
 @LogClass(logger)
 export class Redis extends BaseServer {

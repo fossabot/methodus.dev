@@ -7,7 +7,10 @@ import { MethodError, MethodEvent } from '../../response/';
 import { fp } from '../../fp';
 import { logger, LogClass } from '../../log';
 import { MethodType } from '../../interfaces/methodus';
-import { Request } from '../express/Request';
+
+import * as http from 'http';
+import * as colors from 'colors';
+import { Servers } from '..';
 
 @LogClass(logger)
 export class Fastify extends BaseServer {
@@ -58,13 +61,13 @@ export class Fastify extends BaseServer {
     }
 
     _send(params, methodus, paramsMap, securityContext) {
-        const request = new Request();
-        const baseUrl = methodus.resolver();
-        if (baseUrl) {
-            return request.sendRequest(methodus.verb, baseUrl + methodus.route, params, paramsMap, securityContext);
-        } else {
-            return new MethodError('no server found for this method' + methodus.route, 302);
-        }
+        // const request = new Request();
+        // const baseUrl = methodus.resolver();
+        // if (baseUrl) {
+        //     return request.sendRequest(methodus.verb, baseUrl + methodus.route, params, paramsMap, securityContext);
+        // } else {
+        //     return new MethodError('no server found for this method' + methodus.route, 302);
+        // }
     }
 
     async _sendEvent(methodEvent: MethodEvent) {
@@ -115,4 +118,20 @@ export class FastifyRouter {
             });
         });
     }
+}
+
+export function register(server, parentServer) {
+    const serverType = server.type.name;
+
+    logger.info(this, colors.red(`> Starting HTTP2 server on port ${server.options.port}`));
+    console.log(colors.red(`> Starting HTTP2 server on port ${server.options.port}`));
+    parentServer._app[serverType] = new Fastify(server.options.port, server.options.onStart);
+    const app = Servers.set(server.instanceId, server.type, parentServer._app[serverType]);
+    parentServer.app = app._app;
+
+    const httpServer = Servers.get(server.instanceId, 'http')
+        || http.createServer(app._app);
+        parentServer._app.http = httpServer;
+    Servers.set(server.instanceId, 'http', httpServer);
+
 }

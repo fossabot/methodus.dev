@@ -23,5 +23,12 @@ export function MethodConfig(name: string, middlewares?: any[], repository?: any
         proto.methodus[name].middlewares = middlewares;
         existingMetadata.middlewares = middlewares;
         ClassContainer.set(name, existingMetadata);
+
+        const methods = Object.getOwnPropertyNames(target.prototype);
+
+        methods.forEach((methodName: string): void => {
+           const stud =  target.prototype[methodName];
+        });
+
     };
 }

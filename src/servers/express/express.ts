@@ -7,7 +7,7 @@ import { BaseServer } from '../base';
 import { MethodError, MethodEvent } from '../../response/';
 import { logger, LogClass } from '../../log';
 import { ExpressRouter } from '../express';
-import { Request } from './Request';
+
 import * as fileUpload from 'express-fileupload';
 @LogClass(logger)
 export class Express extends BaseServer {
@@ -70,14 +70,14 @@ export class Express extends BaseServer {
     }
 
     _send(params, methodus, paramsMap, securityContext) {
-        const request = new Request();
-        const baseUrl = methodus.resolver();
-        if (baseUrl) {
-            const myUri = baseUrl + methodus.route;
-            return request.sendRequest(methodus.verb, myUri, params, paramsMap, securityContext);
-        } else {
-            return new MethodError('no server found for this method' + methodus.route, 302);
-        }
+        // const request = new Request();
+        // const baseUrl = methodus.resolver();
+        // if (baseUrl) {
+        //     const myUri = baseUrl + methodus.route;
+        //     return request.sendRequest(methodus.verb, myUri, params, paramsMap, securityContext);
+        // } else {
+        //     return new MethodError('no server found for this method' + methodus.route, 302);
+        // }
     }
     async _sendEvent(methodEvent: MethodEvent) {
         const myMethodEvent = methodEvent;
