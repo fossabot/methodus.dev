@@ -34,25 +34,4 @@ export class FP {
         Expect(parsed).not.toBeNull();
     }
 
-    @Test('array')
-    @TestCase([{ prop1: 1, prop2: 2 }, { prop1: 1, prop2: 2 }])
-    public async array(object: any) {
-
-        const parsed = fp.array(object);
-        Expect(parsed).not.toBeNull();
-    }
-
-    @Test('ensure')
-    @TestCase({ prop1: 1, prop2: 2 })
-    public async ensure(object: any) {
-        fp.ensure(object, 'prop3', 1);
-        Expect(object.prop3).toBe(1);
-    }
-
-    @Test('ensureArray')
-    @TestCase([{ prop1: 1, prop2: 2 }, {}])
-    public async ensureArray(object: any) {
-        fp.ensure(object, 'prop3', 1);
-        Expect(object[0].prop3).toBe(1);
-    }
 }
