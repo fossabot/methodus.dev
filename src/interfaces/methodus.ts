@@ -56,7 +56,7 @@ export const enum ServerType {
     Redis = 'redis',
     Socket = 'socketio',
     Kafka = 'kafka',
-    HTTP2 = 'http2',
+    HTTP2 = 'Http2',
     Custom = 'Custom',
 
 }

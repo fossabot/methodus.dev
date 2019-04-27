@@ -20,7 +20,7 @@ export class MQRouter {
         registerHandlers(proto, this.options);
         registerWorkers(proto, this.options);
     }
-    async registerRoutes(proto, methodus) {
+    async registerRoutes(proto: any, methodus: any) {
         return new Promise((resolve, reject) => {
             const dom = domain.create();
             dom.on('error', () => {
@@ -28,23 +28,23 @@ export class MQRouter {
             });
 
             dom.run(() => {
-                AMQP.connect(this.options).then((conn) => {
-                    conn.on('error', (error) => {
+                AMQP.connect(this.options).then((conn: any) => {
+                    conn.on('error', (error: any) => {
                         console.log(error);
                         this.registerRoutes(proto, methodus);
                     });
-                    conn.on('close', (error) => {
+                    conn.on('close', (error: any) => {
                         console.log(error);
                         this.registerRoutes(proto, methodus);
                     });
 
                     dom.add(conn);
-                    conn.createChannel().then((ch) => {
+                    conn.createChannel().then((ch: any) => {
                         const qname = methodus.name;
-                        ch.assertQueue(qname, { durable: false }).then((q) => {
+                        ch.assertQueue(qname, { durable: false }).then((q: any) => {
                             // ch.assertQueue(q, { durable: false });
                             ch.prefetch(1);
-                            ch.consume(q.queue, async (msg) => {
+                            ch.consume(q.queue, async (msg: any) => {
                                 if (msg && msg.content) {
 
                                     try {
@@ -70,11 +70,11 @@ export class MQRouter {
                                     this.registerRoutes(proto, methodus);
                                 }
                             });
-                        }).catch((error) => {
+                        }).catch((error: any) => {
                             console.log(error);
                         });
                     });
-                }).catch((error) => {
+                }).catch((error: any) => {
                     console.log(error);
                 });
             });

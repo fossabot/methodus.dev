@@ -15,11 +15,11 @@ import { Servers } from '..';
 @LogClass(logger)
 export class Fastify extends BaseServer {
     _app: any;
-    constructor(port, onStart) {
+    constructor(port?: number, onStart?: () => {}) {
         super();
         const baseCertPath = path.join(process.cwd(), 'cert');
         const options: any = {
-            logger: { level: 'info' },
+            logger: { level: 'debug' },
             http2: true,
             https: {
                 allowHTTP1: true,
@@ -29,7 +29,7 @@ export class Fastify extends BaseServer {
         };
 
         this._app = fastify(options);
-        this._app.listen(port, (err, address) => {
+        this._app.listen(port, (err: any, address: any) => {
             if (err) {
                 throw err;
             }
@@ -53,14 +53,14 @@ export class Fastify extends BaseServer {
         this._app.close();
     }
 
-    useClass(classType, methodType) {
-        const router = new FastifyRouter(classType, methodType, this._app);
+    useClass(classType: any, methodType: any) {
         this._app.ready(() => {
             console.log(`fastify is ready.`);
         });
+        return new FastifyRouter(classType, methodType, this._app);
     }
 
-    _send(params, methodus, paramsMap, securityContext) {
+    _send(params: any, methodus: any, paramsMap: any, securityContext: any) {
         // const request = new Request();
         // const baseUrl = methodus.resolver();
         // if (baseUrl) {
@@ -71,18 +71,19 @@ export class Fastify extends BaseServer {
     }
 
     async _sendEvent(methodEvent: MethodEvent) {
-        const meth = methodEvent;
+        return methodEvent;
     }
 }
 
 export class FastifyRouter {
     public routers: any = [];
     constructor(obj: any, methodType: MethodType, app: any) {
-        const methodus = fp.maybeMethodus(obj);
+        const methodus = fp.maybeMethodus(obj)[obj.name];
+
         const proto = fp.maybeProto(obj);
-        const globalMiddlewares = [];
+        const globalMiddlewares: any = [];
         if (methodus.middlewares) {
-            methodus.middlewares.forEach((element) => {
+            methodus.middlewares.forEach((element: any) => {
                 if (element) {
                     globalMiddlewares.push(element);
                 } else {
@@ -91,16 +92,16 @@ export class FastifyRouter {
             });
         }
 
-        const routerDataObject = {};
+        const routerDataObject: any = {};
         // build routes and verbs object
-        Object.keys(methodus._descriptors).forEach((itemKey) => {
+        Object.keys(methodus._descriptors).forEach((itemKey: any) => {
             const item = methodus._descriptors[itemKey];
             routerDataObject[item.route] = routerDataObject[item.route] || [];
             routerDataObject[item.route].push(item);
         });
 
         Object.keys(routerDataObject).forEach((route: string) => {
-            routerDataObject[route].map((item) => {
+            routerDataObject[route].map((item: any) => {
                 const verb = item.verb.toLowerCase();
                 const functionArray: any[] = [...globalMiddlewares];
                 if (item.middlewares) {
@@ -112,7 +113,7 @@ export class FastifyRouter {
                     });
                 }
                 functionArray.push(proto[item.propertyKey].bind(obj));
-                app[verb](route, { logLevel: 'debug' }, async (request, reply) => {
+                app[verb](route, { logLevel: 'debug' }, async (request: any, reply: any) => {
                     await functionArray[0](request, reply);
                 });
             });
@@ -120,13 +121,13 @@ export class FastifyRouter {
     }
 }
 
-export function register(server, parentServer) {
+export function register(server: any, parentServer: any) {
     const serverType = server.type.name;
 
     logger.info(this, colors.red(`> Starting HTTP2 server on port ${server.options.port}`));
     console.log(colors.red(`> Starting HTTP2 server on port ${server.options.port}`));
     parentServer._app[serverType] = new Fastify(server.options.port, server.options.onStart);
-    const app = Servers.set(server.instanceId, server.type, parentServer._app[serverType]);
+    const app = Servers.set(server.instanceId, server.type.name, parentServer._app[serverType]);
     parentServer.app = app._app;
 
     const httpServer = Servers.get(server.instanceId, 'http')

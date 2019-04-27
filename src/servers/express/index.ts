@@ -10,7 +10,7 @@ import { Servers } from '../serversList';
 import { logger, LogClass } from '../../log';
 import { Express } from './express';
 
-export function register(server, parentServer) {
+export function register(server: any, parentServer: any) {
         const serverType = server.type.name;
         logger.info(this, colors.green(`> Starting REST server on port ${server.options.port}`));
         console.log(colors.green(`> Starting REST server on port ${server.options.port}`));

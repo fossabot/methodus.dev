@@ -13,7 +13,7 @@ const kafka = require('kafka-node'),
 export class Kafka extends BaseServer {
     _app: any;
     options: any;
-    constructor(options) {
+    constructor(options: any) {
         super();
         this.options = options;
     }
@@ -22,11 +22,11 @@ export class Kafka extends BaseServer {
 
     }
 
-    useClass(classType) {
+    useClass(classType: any) {
         const router = new KafkaRouter(classType, this.options);
     }
 
-    async _send(functionArgs, methodinformation, paramsMap) {
+    async _send(functionArgs: any, methodinformation: any, paramsMap: any) {
         return new Promise((resolve, reject) => {
             const client = new kafka.KafkaClient({ kafkaHost: '192.168.99.100:9092' });
             const producer = new Producer(client);
@@ -40,17 +40,17 @@ export class Kafka extends BaseServer {
                     { topic: methodinformation.name, messages: stringMessage },
                 ];
 
-            client.on('error', (err) => {
+            client.on('error', (err: any) => {
                 console.log(err);
             });
 
             producer.on('ready', () => {
-                producer.send(payloads, (err, data) => {
+                producer.send(payloads, (err: any, data: any) => {
                     console.log(data);
                 });
             });
 
-            producer.on('error', (err) => {
+            producer.on('error', (err: any) => {
                 console.log(err);
             });
         });
@@ -64,7 +64,8 @@ export class KafkaRouter {
     constructor(obj: any, options: any) {
         this.options = options;
         const proto = fp.maybeProto(obj);
-        const methodus = fp.maybeMethodus(proto);
+
+        const methodus = fp.maybeMethodus(proto)[obj.name];
         const existingClassMetadata: any = Reflect.getOwnMetadata(metadataKey, proto) || {};
 
         existingClassMetadata.returnMessages = true;
@@ -75,13 +76,13 @@ export class KafkaRouter {
         });
     }
 
-    async registerEvents(proto) {
+    async registerEvents(proto: any) {
         return new Promise((resolve, reject) => {
             resolve();
         });
     }
 
-    async registerRoutes(proto, methodus) {
+    async registerRoutes(proto: any, methodus: any) {
         return new Promise((resolve, reject) => {
 
             const Consumer = kafka.Consumer,
@@ -90,7 +91,7 @@ export class KafkaRouter {
             const producer = new Producer(Kclient);
             // Create topics sync
             producer.on('ready', () => {
-                producer.createTopics([methodus.name], false, (err, data) => {
+                producer.createTopics([methodus.name], false, (err: any, data: any) => {
                     console.log(err);
                     const consumer = new Consumer(
                         client,
@@ -103,7 +104,7 @@ export class KafkaRouter {
                         },
                     );
 
-                    consumer.on('message', async (message) => {
+                    consumer.on('message', async (message: any) => {
                         const parsedMessage = fp.maybeJson(message.value) as MethodMessage;
                         await proto[parsedMessage.to](...parsedMessage.args);
                     });

@@ -6,7 +6,7 @@ import { logger } from '../../src/log';
 import { MethodEvent } from '../../src/response';
 import * as domain from 'domain';
 
-export async function registerWorkers(proto, options) {
+export async function registerWorkers(proto: any, options: any) {
     return new Promise((resolve, reject) => {
         let foundEvents = false;
         if (proto.methodus._workevents && Object.keys(proto.methodus._workevents).length > 0) {
@@ -17,21 +17,21 @@ export async function registerWorkers(proto, options) {
             });
             foundEvents = true;
             dom.run(() => {
-                AMQP.connect(options).then((conn) => {
-                    conn.createChannel().then((ch) => {
+                AMQP.connect(options).then((conn: any) => {
+                    conn.createChannel().then((ch: any) => {
                         let exchangeArr = fp.unique(Object.keys(proto.methodus._workevents)
                             .map((event) => proto.methodus._workevents[event].exchange));
                         if (exchangeArr.length === 0) {
                             exchangeArr = ['event-bus'];
                         }
-                        exchangeArr.forEach((exchange) => {
+                        exchangeArr.forEach((exchange: any) => {
                             ch.assertQueue(proto.methodus.workQueueName,
-                                { exclusive: false, durable: true }).then((q) => {
-                                    Object.keys(proto.methodus._workevents).forEach((event) => {
+                                { exclusive: false, durable: true }).then((q: any) => {
+                                    Object.keys(proto.methodus._workevents).forEach((event: any) => {
                                         ch.bindQueue(q.queue, exchange, proto.methodus._workevents[event].name);
                                     });
                                     ch.prefetch(1);
-                                    ch.consume(q.queue, async (msg) => {
+                                    ch.consume(q.queue, async (msg: any) => {
                                         if (msg && msg.content) {
                                             logger.log(this, ' [x] %s', msg.content.toString());
                                             logger.log(this, 'event message has arrived', msg.fields.routingKey);

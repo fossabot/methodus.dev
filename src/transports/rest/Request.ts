@@ -11,14 +11,14 @@ import * as request from 'request-promise-native';
 @LogClass(logger)
 export class Request {
 
-    sendRequest(verb, uri, params, paramsMap, securityContext) {
-        const body = {};
-        const headers = {};
-        const cookies = {};
-        const query = {};
+    sendRequest(verb: any, uri: any, params: any, paramsMap: any, securityContext: any) {
+        const body: any = {};
+        const headers: any = {};
+        const cookies: any = {};
+        const query: any = {};
         const files: any = [];
         try {
-            paramsMap.forEach((item) => {
+            paramsMap.forEach((item: any) => {
                 item.value = params[item.index];
                 switch (item.from) {
                     case 'params':
@@ -200,7 +200,7 @@ export class Request {
         }
     }
 
-    public promiseToTry(requestOptions) {
+    public promiseToTry(requestOptions: any) {
         requestOptions.retryCount = requestOptions.retryCount || 0;
         try {
             // let result = await
@@ -212,10 +212,10 @@ export class Request {
         }
     }
 
-    public try(requestOptions) {
+    public try(requestOptions: any) {
 
         const requestToPipe = request(requestOptions);
-        requestToPipe.on('error', (error) => {
+        requestToPipe.on('error', (error: any) => {
 
             console.error(error);
         });

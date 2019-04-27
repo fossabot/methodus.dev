@@ -1,6 +1,6 @@
 export class ConnectionOptions {
-    amqp;
-    name;
-    userName;
-    password;
+    amqp: any;
+    name: any;
+    userName: any;
+    password: any;
 }

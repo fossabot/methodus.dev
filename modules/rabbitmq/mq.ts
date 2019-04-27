@@ -12,7 +12,7 @@ import { AMQP } from './amqp';
 export class MQ extends BaseServer {
     _app: any;
     options: any;
-    constructor(options) {
+    constructor(options: any) {
         super();
         this.options = options;
     }
@@ -20,10 +20,10 @@ export class MQ extends BaseServer {
     async _sendEvent(methodEvent: MethodEvent) {
         return new Promise((resolve, reject) => {
 
-            AMQP.connect(this.options).then((conn) => {
-                conn.createChannel().then((ch) => {
+            AMQP.connect(this.options).then((conn: any) => {
+                conn.createChannel().then((ch: any) => {
                     const exchangeArr = methodEvent.exchanges || ['event-bus'];
-                    exchangeArr.forEach((exchange) => {
+                    exchangeArr.forEach((exchange: any) => {
                         ch.assertExchange(exchange);
                         ch.publish(exchange, methodEvent.name, Buffer.from(JSON.stringify(methodEvent)));
                     });
@@ -32,22 +32,22 @@ export class MQ extends BaseServer {
         });
     }
 
-    useClass(classType, methodType: MethodType) {
+    useClass(classType: any, methodType: MethodType) {
         if (methodType === MethodType.Local) {
-            const router = new MQRouter(classType, this.options);
+            return new MQRouter(classType, this.options);
         }
     }
 
-    async _send(functionArgs, methodinformation, paramsMap) {
+    async _send(functionArgs: any, methodinformation: any, paramsMap: any) {
         return new Promise((resolve, reject) => {
-            AMQP.connect(this.options).then((conn) => {
-                conn.createChannel().then((ch) => {
+            AMQP.connect(this.options).then((conn: any) => {
+                conn.createChannel().then((ch: any) => {
                     const methodMessage = new MethodMessage(methodinformation.propertyKey, paramsMap,
                         methodinformation, functionArgs);
                     const stringMessage = JSON.stringify(methodMessage);
-                    ch.assertQueue('', { exclusive: true, autoDelete: true }).then((q) => {
+                    ch.assertQueue('', { exclusive: true, autoDelete: true }).then((q: any) => {
                         const corr = generateUuid();
-                        ch.consume(q.queue, (msg) => {
+                        ch.consume(q.queue, (msg: any) => {
                             if (msg.properties.correlationId === corr) {
                                 resolve(fp.maybeJson(msg.content.toString()));
                             }
@@ -57,13 +57,13 @@ export class MQ extends BaseServer {
                             new Buffer(stringMessage),
                             { correlationId: corr, replyTo: q.queue });
 
-                    }).catch((error) => {
+                    }).catch((error: any) => {
                         console.error(error);
                     });
-                }).catch((error) => {
+                }).catch((error: any) => {
                     console.error(error);
                 });
-            }).catch((error) => {
+            }).catch((error: any) => {
                 console.error(error);
             });
         });

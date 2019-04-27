@@ -27,8 +27,17 @@ export function MethodConfig(name: string, middlewares?: any[], repository?: any
         const methods = Object.getOwnPropertyNames(target.prototype);
 
         methods.forEach((methodName: string): void => {
-           const stud =  target.prototype[methodName];
+           return target.prototype[methodName];
         });
+
+        if (target.prototype.constructor) {
+            const staticMethods = Object.getOwnPropertyNames(target.prototype.constructor);
+
+            staticMethods.forEach((methodName: string): void => {
+                // this is need in order to "wake up" the functions
+                return target.prototype.constructor[methodName];
+            });
+        }
 
     };
 }

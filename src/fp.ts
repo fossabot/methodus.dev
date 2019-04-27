@@ -1,10 +1,10 @@
-function isObject(value) {
+function isObject(value: any) {
     const type = typeof value;
     return value != null && (type === 'object' || type === 'function');
 }
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
-function arrayEach(array, iteratee) {
+function arrayEach(array: any, iteratee: any) {
     let index = -1;
     const length = array == null ? 0 : array.length;
 
@@ -15,13 +15,13 @@ function arrayEach(array, iteratee) {
     }
     return array;
 }
-function keys(object) {
+function keys(object: any) {
     return isArrayLike(object)
         ? arrayLikeKeys(object)
         : Object.keys(Object(object));
 }
 
-function arrayLikeKeys(value, inherited?) {
+function arrayLikeKeys(value: any, inherited?: any) {
     const isArr = Array.isArray(value);
 
     const skipIndexes = isArr; // || isArg || isBuff || isType
@@ -44,11 +44,11 @@ function arrayLikeKeys(value, inherited?) {
     return result;
 }
 
-function isArrayLike(value) {
+function isArrayLike(value: any) {
     return value != null && typeof value !== 'function' && value.length !== undefined;
 }
 
-function baseFor(object, iteratee, keysFunc) {
+function baseFor(object: any, iteratee: any, keysFunc: any) {
     const iterable = Object(object);
     const props = keysFunc(object);
     let { length } = props;
@@ -62,7 +62,7 @@ function baseFor(object, iteratee, keysFunc) {
     }
     return object;
 }
-function baseForOwn(object, iteratee) {
+function baseForOwn(object: any, iteratee: any) {
     return object && baseFor(object, iteratee, keys);
 }
 export class fp {
@@ -78,7 +78,7 @@ export class fp {
         return [...new Set(myArray)];
     }
 
-    public static transform(object, iteratee, accumulator) {
+    public static transform(object: any, iteratee: any, accumulator: any) {
         const isArr = Array.isArray(object);
         const isArrLike = isArr || Buffer.isBuffer(object) || Array.isArray(object);
         if (accumulator == null) {
@@ -93,7 +93,7 @@ export class fp {
                 accumulator = {};
             }
         }
-        (isArrLike ? arrayEach : baseForOwn)(object, (value, index, aobj) =>
+        (isArrLike ? arrayEach : baseForOwn)(object, (value: any, index: any, aobj: any) =>
             iteratee(accumulator, value, index, aobj));
         return accumulator;
     }
@@ -127,9 +127,9 @@ export class fp {
         return proto.methodus;
     }
 
-    public static maybeEach(object: any, callback) {
+    public static maybeEach(object: any, callback: any) {
         if (object.forEach) {
-            object.forEach((item) => {
+            object.forEach((item: any) => {
                 callback(item);
             });
         }
@@ -173,7 +173,7 @@ export class fp {
         }
     }
 
-    public static ensure(object: object, property: string | string[], defaultValue?: any) {
+    public static ensure(object: any, property: string | string[], defaultValue?: any) {
         if (Array.isArray(property)) {
             (property).forEach((prop) => {
                 if (!object[prop]) {

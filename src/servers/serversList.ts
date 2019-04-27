@@ -6,20 +6,22 @@ import { ServerType } from '../interfaces';
 export class ServersList {
     public instances: any = {};
     public classes: any;
+    public clients: any;
     constructor() {
         this.classes = {};
         this.instances = {};
+        this.clients = {};
     }
-    public addServer(server) {
+    public addServer(server: any) {
         const id = uuidv1();
         this.instances[id] = server;
         return id;
     }
-    public set(instanceId, serverType, instance) {
+    public set(instanceId: any, serverType: any, instance: any) {
         this.instances[instanceId][serverType] = instance;
         return instance;
     }
-    public get(instanceId, serverType?) {
+    public get(instanceId: any, serverType?: any) {
         if (serverType) {
             return this.instances[instanceId][serverType];
         } else {

@@ -15,7 +15,7 @@ import { Servers } from '../';
 @LogClass(logger)
 export class SocketIO extends BaseServer {
     _app: any;
-    constructor(options, httpServer) {
+    constructor(options: any, httpServer: any) {
         super();
         this.classRouters = [];
 
@@ -31,11 +31,11 @@ export class SocketIO extends BaseServer {
             nsp = this._app.of(options.nsp);
         }
 
-        nsp.on('connection', (socket) => {
+        nsp.on('connection', (socket: any) => {
             this.socketHandler(socket);
         });
 
-        nsp.use((socket, next) => {
+        nsp.use((socket: any, next: any) => {
             next();
         });
 
@@ -43,29 +43,29 @@ export class SocketIO extends BaseServer {
     close() {
         this._app.close();
     }
-    useClass(classType) {
+    useClass(classType: any) {
         this.classRouters.push(classType);
     }
 
-    socketHandler(socket) {
+    socketHandler(socket: any) {
         if (!socket.attached) {
-            this.classRouters.forEach((item) => {
-                const socketServer = new SocketIORouter(item, socket);
+            this.classRouters.forEach((item: any) => {
+             return new SocketIORouter(item, socket);
             });
             socket.attached = true;
         }
 
     }
     async _sendEvent(methodEvent: MethodEvent) {
-        const mymethodEvent = methodEvent;
+        return  methodEvent;
     }
-    async _send(functionArgs, methodus, paramsMap) {
+    async _send(functionArgs: any, methodus: any, paramsMap: any) {
         return new Promise(async (resolve, reject) => {
             debug('sending data in socket', functionArgs, methodus, paramsMap);
 
-            const dataObject = {};
-            functionArgs.forEach((element, index) => {
-                dataObject[paramsMap.filter((item) => {
+            const dataObject: any = {};
+            functionArgs.forEach((element: any, index: any) => {
+                dataObject[paramsMap.filter((item: any) => {
                     return item.index === index;
                 })[0].name] = element;
             });
@@ -76,7 +76,7 @@ export class SocketIO extends BaseServer {
                 debug('socket connection ok');
                 const messageName = methodus.verb + '_' + methodus.route;
                 debug('messageName:method:recipient', messageName);
-                socket.emit(messageName, dataObject, (data) => {
+                socket.emit(messageName, dataObject, (data: any) => {
                     debug('recieved result', data);
                     if (data.error && data.statusCode) {
                         logger.error(data);
@@ -108,7 +108,7 @@ export class SocketIORouter implements Methodus.Router {
             debug('activating controller method', item, methodus);
             logger.info(this, `registering socket event`, item.verb + '_' + item.route);
 
-            socket.on(item.verb + '_' + item.route, async (data, callback) => {
+            socket.on(item.verb + '_' + item.route, async (data: any, callback: any) => {
                 // parse params
                 debug('activating controller method', itemKey, data);
 
@@ -116,7 +116,7 @@ export class SocketIORouter implements Methodus.Router {
                 debug('method params', itemKey, paramsMap);
                 const functionArgs: any = [];
 
-                methodus._descriptors[itemKey].params.forEach((xitem) => {
+                methodus._descriptors[itemKey].params.forEach((xitem: any) => {
                     functionArgs[xitem.index] = data[xitem.name];
                 });
 
@@ -133,7 +133,7 @@ export class SocketIORouter implements Methodus.Router {
     }
 }
 
-export function register(server, parentServer) {
+export function register(server: any, parentServer: any) {
     const serverType = server.type.name;
 
     logger.info(this, colors.green(`> Starting SOCKETIO server on port ${server.options.port}`));

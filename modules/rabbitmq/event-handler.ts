@@ -5,7 +5,7 @@ import { logger } from '../../src/log';
 import { MethodEvent } from '../../src/response';
 import * as domain from 'domain';
 
-export async function registerHandlers(proto, options) {
+export async function registerHandlers(proto: any, options: any) {
     return new Promise((resolve, reject) => {
         let foundEvents = false;
         if (proto.methodus._events && Object.keys(proto.methodus._events).length > 0) {
@@ -17,23 +17,23 @@ export async function registerHandlers(proto, options) {
             });
 
             dom.run(() => {
-                AMQP.connect(options).then((conn) => {
-                    conn.createChannel().then((ch) => {
+                AMQP.connect(options).then((conn: any) => {
+                    conn.createChannel().then((ch: any) => {
                         let exchangeArr = fp.unique(Object.keys(proto.methodus._events)
                             .map((event) => proto.methodus._events[event].exchange));
                         if (exchangeArr.length === 0) {
                             exchangeArr = ['event-bus'];
                         }
                         logger.log(this, exchangeArr);
-                        exchangeArr.forEach((exchange) => {
+                        exchangeArr.forEach((exchange: any) => {
                             //  let exchange = proto.methodus.exchange || 'event-bus';
 
-                            ch.assertQueue('', { exclusive: true, durable: true }).then((q) => {
-                                Object.keys(proto.methodus._events).forEach((event) => {
+                            ch.assertQueue('', { exclusive: true, durable: true }).then((q: any) => {
+                                Object.keys(proto.methodus._events).forEach((event: any) => {
                                     ch.bindQueue(q.queue, exchange, proto.methodus._events[event].name);
                                 });
 
-                                ch.consume(q.queue, async (msg) => {
+                                ch.consume(q.queue, async (msg: any) => {
                                     if (msg && msg.content) {
                                         logger.log(this, ' [x] %s', msg.content.toString());
                                         logger.log(this, 'event message has arrived', msg.fields.routingKey);
@@ -49,7 +49,7 @@ export async function registerHandlers(proto, options) {
                                                 }
                                             } else {
                                                 // perform a wild card search
-                                                Object.keys(proto.methodus._events).forEach(async (eventName) => {
+                                                Object.keys(proto.methodus._events).forEach(async (eventName: any) => {
                                                     const eventNameWithoutStar = eventName.replace(/\*/g, '');
                                                     if (parsedMessage.name.indexOf(eventNameWithoutStar) === 0) {
                                                         const pkey = proto.methodus._events[eventName].propertyKey;

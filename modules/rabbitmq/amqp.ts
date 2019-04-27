@@ -1,8 +1,7 @@
 
-import { Container } from '../../src/container';
 import { MethodError } from '../../src/response/';
 import { ConnectionOptions } from './connection-options';
-const amqp = Container.get('amqplib');
+const amqp = require('amqplib');
 export class AMQP {
     public static async connect(connectionOptions: ConnectionOptions, forceReconnect?: boolean) {
         if (AMQP._connection && !forceReconnect) {
@@ -34,5 +33,5 @@ export class AMQP {
             throw (new MethodError(error));
         }
     }
-    private static _connection;
+    private static _connection: any;
 }
